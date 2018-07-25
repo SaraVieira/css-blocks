@@ -1,15 +1,15 @@
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const path = require('path');
-const CssBlocks = require("@css-blocks/jsx");
-const CssBlocksPlugin = require("@css-blocks/webpack").CssBlocksPlugin;
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const path = require('path')
+const CssBlocks = require('@css-blocks/jsx')
+const CssBlocksPlugin = require('@css-blocks/webpack').CssBlocksPlugin
 
-if (typeof process.env.NODE_ENV === "undefined") {
-  process.env.NODE_ENV = 'development';
+if (typeof process.env.NODE_ENV === 'undefined') {
+  process.env.NODE_ENV = 'development'
 }
 
 const paths = {
   appIndexJs: './src/index.js'
-};
+}
 
 const jsxCompilationOptions = {
   compilationOptions: {},
@@ -18,30 +18,35 @@ const jsxCompilationOptions = {
     mergeDeclarations: true,
     removeUnusedStyles: true,
     conflictResolution: true,
-    enabled: process.env.NODE_ENV === "production",
+    enabled: process.env.NODE_ENV === 'production'
   },
   aliases: {}
-};
+}
 
-const CssBlockRewriter = new CssBlocks.Rewriter(jsxCompilationOptions);
-const CssBlockAnalyzer = new CssBlocks.Analyzer(paths.appIndexJs, jsxCompilationOptions);
+const CssBlockRewriter = new CssBlocks.Rewriter(jsxCompilationOptions)
+const CssBlockAnalyzer = new CssBlocks.Analyzer(
+  paths.appIndexJs,
+  jsxCompilationOptions
+)
 
 const config = {
-  entry: [ paths.appIndexJs ],
-  // mode: 'development',
+  entry: [paths.appIndexJs],
   module: {
     rules: [
-      // {
-      //   test: /\.css$/,
-      //   use: ['style-loader', 'css-loader']
-      // },
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        use: [{
+        use: [
+          {
             loader: require.resolve('babel-loader'),
             options: {
-              presets: [require.resolve('babel-preset-react-app')],
+              presets: [
+                require.resolve('babel-preset-react'),
+                require.resolve('babel-preset-env')
+              ],
+              plugins: [
+                require.resolve('babel-plugin-transform-class-properties')
+              ],
               cacheDirectory: true,
               compact: true
             }
@@ -54,7 +59,9 @@ const config = {
             loader: require.resolve('babel-loader'),
             options: {
               plugins: [
-                require('@css-blocks/jsx/dist/src/transformer/babel').makePlugin({ rewriter: CssBlockRewriter })
+                require('@css-blocks/jsx/dist/src/transformer/babel').makePlugin(
+                  { rewriter: CssBlockRewriter }
+                )
               ],
               cacheDirectory: false,
               compact: true,
@@ -89,10 +96,13 @@ const config = {
       template: 'src/index.html'
     })
   ],
+  resolve: {
+    extensions: ['.jsx', '.js', '.json']
+  },
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist')
   }
-};
+}
 
-module.exports = config;
+module.exports = config
